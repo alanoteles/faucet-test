@@ -1,0 +1,112 @@
+
+0x6080604052348015600f57600080fd5b50604580601d6000396000f3fe
+
+60 80 60 40 52 34 80 15 60 0f 57 60 00 80 fd 5b 50 60 45 80 60 1d 60 00 39 60 00 f3 fe
+0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28
+
+// STACK
+
+0x60 = PUSH -> place 1 byte item to the STACK
+
+PUSH 0X40 -> second instruction
+PUSH 0x80 -> first instruction
+
+// MEMORY
+0X52 = MSTORE -> save word to memory
+
+Memory[0x40] = 0x80  // Free memory pointer
+After this operation, the values in the stack are cleared.
+
+This sequence of initialization instructions will be present in almost every smart contract
+
+
+
+
+0x34 - Get deposited value by the instruction/transaction responsible for this execution
+0x80 - Duplicate 1st stack item
+// STACK
+
+0x00 -> item duplicated by the second instruction
+0x00 -> this is the value returned by the inbstruction. In our case, the value available in the contract was 0.
+
+0x15 -> Simple not operator
+This instruction will change the signal of the item duplicated. it will change from 0 to 1
+
+// STACK
+0x01 -> item duplicated by the second instruction and changed by the last instruction
+0x00 -> this is the value returned by the inbstruction. In our case, the value available in the contract was 0.
+
+
+0x60 -> PUSH 0f to the stack
+// STACK
+0x0f -> STACK[0]
+0x01 -> STACK[1]
+0x00 -> STACK[2]
+
+0x57 -> JUMPI - Conditionally alter the program counter. This instructionalso remove 2 items of the stack. Items 0 and 1
+The decimal value of 0x0f is 15. So the programn execution will jump for the instruction at this position, which
+in this case, is where the value 0x5b is located.
+// STACK
+0x00 -> STACK[2]
+
+
+0x5b -> JUMPDEST - Mark a valid destination for jumps. This operation has no effect on machine state during execution.
+
+0x50 -> POP -> Remove item from stack.
+// STACK
+Stack is empty now.
+
+0x60 -> PUSH 0x45 to the stack
+// STACK
+0x45
+
+0x80 -> Duplicate item
+// STACK
+0x45
+0x45
+
+0x60 -> PUSH 0x1d to the stack
+// STACK
+0x1d
+0x45
+0x45
+
+0x60 -> PUSH 0x00 to the stack
+// STACK
+0x00
+0x1d
+0x45
+0x45
+
+0x39 -> CODECOPY - Copy code running in current environment to memory.
+This works like that:
+stack[0] -> memory offset to write - the value will be writen where the 0x00 is located
+stack[1] -> bytecode offset to read from. 0x1d in decimal is equal do 29. So the copy will start at position 29 of the bytecode
+stack[2] -> length of bytecode to copy. 0x45 in decimal is equal do 69. So it will copy 69 bytes starting at position 29
+
+This position is where the deployed code starts. Tghe instruction is saying to copy the program to the memory position 0x00
+This 3 values will be removed from the stack after execution of the CODECOPY instruction
+// STACK
+0x45
+
+0x60 -> PUSH 0x00 to the stack
+// STACK
+0x00
+0x45
+
+0xf3 -> RETURN -  Halt execution returning output data (which in this case is our bytecode data). And remove 2 values from the stack
+In this case, the 0x00 is the bytecode to be returned and the 0x45 is the length of the bytecode returned.
+// STACK
+Is empty now
+
+// MEMORY
+Memory[0x40] = 0x80  // Free memory pointer
+Memory[0x00] = code copied to the Ethereum
+
+0xfe -> INVALID - Designated invalid instruction. This basically is marking the end of the initialization code. 
+
+
+
+
+
+web3.eth.sendTransaction({from: accounts[0], to: "0xc1996d44c1c1682420Bd09818bAc9343C44299D9", date: "a26759cb", value: "3000000000000000000"})
