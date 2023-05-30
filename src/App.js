@@ -23,6 +23,14 @@ const App = () => {
 
   const setAccountListener = provider => {
     provider.on("accountsChanged", accounts => setAccount(accounts[0]))
+
+    // provider._jsonRpcConnection.events.on("notification", (payload) => {
+    //   const { method } = payload
+
+    //   if(method === "metamask_unlockStateChanged") {
+    //     setAccount(null)
+    //   }
+    // })
   }
   
   useEffect(() => {
@@ -106,8 +114,21 @@ const App = () => {
           <div className="balance-view is-size-2 my-4">
             Current balance: <strong>{ balance } ETH</strong>
           </div>
-          <button className="button is-link mr-2" onClick={ addFunds }>Donate 1ETH</button>
-          <button className="button is-primary" onClick={ withdraw }>Withdraw</button>
+          <button 
+            className="button is-link mr-2" 
+            onClick={ addFunds }
+            disabled={!account}
+          >
+            Donate 1ETH
+          </button>
+          
+          <button 
+            className="button is-primary" 
+            onClick={ withdraw }
+            disabled={!account}
+          >
+            Withdraw
+          </button>
         </div>
       </div>
     </>
