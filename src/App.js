@@ -18,12 +18,15 @@ const App = () => {
   const [account, setAccount] = useState(null)
   const [shouldReload, setShouldReload] = useState(false)
 
+  const canConnectToContract = account && web3Api.contract
+
   const reloadEffect = useCallback(() => {
     setShouldReload(!shouldReload)
   }, [shouldReload])
 
   const setAccountListener = provider => {
     provider.on("accountsChanged", accounts => setAccount(accounts[0]))
+    provider.on("chainChanged", _ => window.location.reload())
 
     // provider._jsonRpcConnection.events.on("notification", (payload) => {
     //   const { method } = payload
@@ -130,10 +133,15 @@ const App = () => {
           <div className="balance-view is-size-2 my-4">
             Current balance: <strong>{ balance } ETH</strong>
           </div>
+          { !canConnectToContract &&
+              <i className="is-block">
+                Connect to Ganache
+              </i>
+          }
           <button 
             className="button is-link mr-2" 
             onClick={ addFunds }
-            disabled={!account}
+            disabled={!canConnectToContract}
           >
             Donate 1ETH
           </button>
@@ -141,7 +149,7 @@ const App = () => {
           <button 
             className="button is-primary" 
             onClick={ withdraw }
-            disabled={!account}
+            disabled={!canConnectToContract}
           >
             Withdraw
           </button>
