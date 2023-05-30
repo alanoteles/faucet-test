@@ -36,9 +36,9 @@ const App = () => {
   useEffect(() => {
     const loadProvider = async () => {
       const provider = await detectEthereumProvider()
-      const contract = await loadContract("Faucet", provider)
-
+      
       if (provider) {
+        const contract = await loadContract("Faucet", provider)
         // provider.request({method: "eth_requestAccounts"})
         setAccountListener(provider)
         setWeb3Api({
@@ -102,11 +102,20 @@ const App = () => {
               <strong className="mr-2">Account: </strong>
             </span>
               { account ? 
-                  <div>{account}</div> :  
+                  <div>{account}</div> :
+                  !web3Api.provider ?
+                  <>
+                    <div className="notification is-warning is-size-6 is-rounded">
+                      Wallet not detected { ` - `}
+                      <a target="_blank" href="https://metamask.io/download/">
+                        Install Metamask
+                      </a>
+                    </div>
+                  </> :
                   <button className="button is-small"
-                  onClick={() => 
-                    web3Api.provider.request({method: "eth_requestAccounts"})
-                  }>
+                    onClick={() => 
+                      web3Api.provider.request({method: "eth_requestAccounts"})
+                    }>
                     Connect Wallet
                   </button>
               }
